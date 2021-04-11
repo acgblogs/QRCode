@@ -1,0 +1,79 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./vue@2.6.12.js"></script>
+    <script src="./QRCode.js"></script>
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+    <div id="app">
+        <div>
+            <h3>二维码版本2-L，限制长度（32字符）： {{inputText.length}}</h3>
+            <input type="text" v-model="inputText" maxlength="32">
+            <input type="button" value="切换二维码主题" @click="changeQRCode()">
+        </div>
+        <div id="container">
+            <table :style="getBackgroundImage">
+                <tr v-for="(trData,index) in list" :key="index">
+                    <td v-for="(tdData,order) in trData" :key="order" :class="getTdClass(tdData)" />
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+<script>
+    let vueApp = new Vue({
+        el: '#app',
+        data: {
+            list: [],
+            activeIndex: 0,
+            QRCode: [{
+                text: 'web is nice, tel: 13012011088',
+                url: './cc.png'
+            }, {
+                text: 'it is a sunny day',
+                url: './weilai.png'
+            }, {
+                text: 'join_us@henhaoji.com',
+                url: './zhushou.png'
+            }],
+            theme: {
+                0: 'green',
+                1: 'purple',
+                2: 'black'
+            },
+            inputText: 'This is a picture of the QR code'
+        },
+        created() {
+            this.getData()
+        },
+        computed: {
+            getBackgroundImage() {
+                return {
+                    backgroundImage: `url(${this.QRCode[this.activeIndex].url})`
+                }
+            }
+        },
+        watch: {
+            inputText() {
+                this.getData()
+            }
+        },
+        methods: {
+            getData() {
+                this.list = new QRCode(this.inputText).getData()
+            },
+            changeQRCode() {
+                this.activeIndex = ++this.activeIndex % 3
+                this.inputText = this.QRCode[this.activeIndex].text
+            },
+            getTdClass(data) {
+                return [this.theme[this.activeIndex]].concat(data && 'dark' || '')
+            }
+        }
+    })
+</script>
+
+</html>
